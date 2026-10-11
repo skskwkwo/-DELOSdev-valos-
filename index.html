@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#05060a" />
+  <title>DELOS — Real-time Neural Console</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ====================== Animated RGB backdrop ====================== -->
+  <div class="aurora" aria-hidden="true">
+    <span class="orb orb-a"></span>
+    <span class="orb orb-b"></span>
+    <span class="orb orb-c"></span>
+    <span class="orb orb-d"></span>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- ====================== macOS window ====================== -->
+  <div class="window" id="window">
+
+    <!-- Title bar -->
+    <header class="titlebar">
+      <div class="traffic">
+        <button class="dot dot-red" id="btnClose" title="닫기"></button>
+        <button class="dot dot-yellow" id="btnMin" title="최소화"></button>
+        <button class="dot dot-green" id="btnMax" title="확대"></button>
+      </div>
+
+      <div class="titlebar-center">
+        <!-- DELOS futuristic logo -->
+        <div class="delos-logo" title="DELOS">
+          <svg class="delos-mark" viewBox="0 0 48 48" width="26" height="26" aria-hidden="true">
+            <defs>
+              <linearGradient id="delosGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#4ea8ff"/>
+                <stop offset="50%" stop-color="#a15bff"/>
+                <stop offset="100%" stop-color="#ff4ecd"/>
+              </linearGradient>
+              <linearGradient id="delosGrad2" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0%" stop-color="#31e6ff"/>
+                <stop offset="100%" stop-color="#7a5cff"/>
+              </linearGradient>
+            </defs>
+            <polygon points="24,3 43,14 43,34 24,45 5,34 5,14"
+              fill="none" stroke="url(#delosGrad)" stroke-width="2" class="delos-poly"/>
+            <polygon points="24,11 36,18 36,30 24,37 12,30 12,18"
+              fill="none" stroke="url(#delosGrad2)" stroke-width="1.4" opacity="0.75"/>
+            <path d="M24 11 L24 37 M12 18 L36 30 M36 18 L12 30"
+              stroke="url(#delosGrad)" stroke-width="0.9" opacity="0.5"/>
+            <circle cx="24" cy="24" r="3.2" fill="url(#delosGrad)" class="delos-core"/>
+          </svg>
+          <span class="delos-word">
+            <span>D</span><span>E</span><span>L</span><span>O</span><span>S</span>
+          </span>
+          <span class="delos-sub">neural console</span>
+        </div>
+      </div>
+
+      <div class="titlebar-right">
+        <span class="status-pill" id="statusPill">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">연결 확인 중</span>
+        </span>
+      </div>
+    </header>
+
+    <!-- ====================== Body ====================== -->
+    <div class="window-body">
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="side-brand">
+          <!-- Devil fox logo -->
+          <svg class="fox-logo" viewBox="0 0 160 160" width="96" height="96" aria-label="Devil Fox">
+            <defs>
+              <linearGradient id="foxFire" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ff2d6f"/>
+                <stop offset="45%" stop-color="#ff8a3d"/>
+                <stop offset="100%" stop-color="#ffd23d"/>
+              </linearGradient>
+              <linearGradient id="foxHorn" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ff3d9a"/>
+                <stop offset="100%" stop-color="#6b1cff"/>
+              </linearGradient>
+              <radialGradient id="foxGlow" cx="50%" cy="42%" r="60%">
+                <stop offset="0%" stop-color="#ff2d6f" stop-opacity="0.55"/>
+                <stop offset="100%" stop-color="#ff2d6f" stop-opacity="0"/>
+              </radialGradient>
+              <filter id="foxBlur" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="6" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <circle cx="80" cy="80" r="62" fill="url(#foxGlow)"/>
+
+            <!-- Devil horns -->
+            <path d="M46 26 C40 12 46 4 56 6 C50 14 52 22 60 30 Z" fill="url(#foxHorn)" opacity="0.95"/>
+            <path d="M114 26 C120 12 114 4 104 6 C110 14 108 22 100 30 Z" fill="url(#foxHorn)" opacity="0.95"/>
+
+            <!-- Ears -->
+            <path d="M34 42 L60 44 L36 74 Z" fill="url(#foxFire)"/>
+            <path d="M126 42 L100 44 L124 74 Z" fill="url(#foxFire)"/>
+            <path d="M42 48 L56 50 L44 66 Z" fill="#2a0a1a" opacity="0.85"/>
+            <path d="M118 48 L104 50 L116 66 Z" fill="#2a0a1a" opacity="0.85"/>
+
+            <!-- Head -->
+            <path d="M80 36 L114 50 L106 92 L80 128 L54 92 L46 50 Z"
+              fill="url(#foxFire)" filter="url(#foxBlur)"/>
+            <path d="M80 44 L108 55 L101 90 L80 120 L59 90 L52 55 Z"
+              fill="#14040d" opacity="0.55"/>
+
+            <!-- Cheeks -->
+            <path d="M52 78 L70 92 L58 96 Z" fill="#ffd9a8" opacity="0.92"/>
+            <path d="M108 78 L90 92 L102 96 Z" fill="#ffd9a8" opacity="0.92"/>
+
+            <!-- Eyes -->
+            <path d="M60 70 L76 76 L64 82 Z" fill="#0affff" class="fox-eye"/>
+            <path d="M100 70 L84 76 L96 82 Z" fill="#0affff" class="fox-eye"/>
+            <circle cx="68" cy="76" r="2.1" fill="#04222a"/>
+            <circle cx="92" cy="76" r="2.1" fill="#04222a"/>
+
+            <!-- Snout -->
+            <path d="M80 92 L86 102 L80 108 L74 102 Z" fill="#1a0510"/>
+            <path d="M80 108 L80 116" stroke="#ffb3d4" stroke-width="2" stroke-linecap="round"/>
+
+            <!-- Flame tail -->
+            <path d="M80 118 C70 132 86 140 74 154 C92 148 96 136 84 126 Z"
+              fill="url(#foxFire)" opacity="0.9"/>
+          </svg>
+          <h1 class="side-title">DELOS</h1>
+          <p class="side-tag">Devil Fox AI · 실시간 스트리밍</p>
+        </div>
+
+        <div class="side-scroll">
+          <section class="side-block">
+            <label class="side-label">모델</label>
+            <div class="select-wrap">
+              <select id="modelSelect" class="glass-select">
+                <option value="llama3.2">llama3.2</option>
+              </select>
+            </div>
+            <button class="btn-ghost" id="refreshModels">모델 목록 새로고침</button>
+          </section>
+
+          <section class="side-block">
+            <label class="side-label">시스템 프롬프트</label>
+            <textarea id="systemPrompt" class="glass-input" rows="4"
+              placeholder="모델의 역할과 페르소나를 지정하세요">당신은 DELOS의 정밀한 AI 어시스턴트 데빌폭스입니다. 사실에 근거해 정확하고 간결하게 답하며, 제공된 웹 리서치 컨텍스트를 우선적으로 인용합니다.</textarea>
+          </section>
+
+          <section class="side-block">
+            <div class="side-label-row">
+              <label class="side-label">Temperature</label>
+              <span class="value-chip" id="tempValue">0.70</span>
+            </div>
+            <input type="range" id="tempRange" min="0" max="1.5" step="0.05" value="0.7" class="range" />
+          </section>
+
+          <section class="side-block">
+            <label class="side-label">추론 옵션</label>
+            <label class="switch-row">
+              <span>실시간 웹 리서치 (DuckDuckGo)</span>
+              <input type="checkbox" id="optResearch" class="switch" checked />
+            </label>
+            <label class="switch-row">
+              <span>리서치 깊이 자동 확장</span>
+              <input type="checkbox" id="optDeep" class="switch" checked />
+            </label>
+            <label class="switch-row">
+              <span>출처 인용 모드</span>
+              <input type="checkbox" id="optCite" class="switch" checked />
+            </label>
+            <label class="switch-row">
+              <span>사운드 피드백</span>
+              <input type="checkbox" id="optSound" class="switch" />
+            </label>
+          </section>
+
+          <section class="side-block">
+            <label class="side-label">대화</label>
+            <button class="btn-primary" id="newChat">새 대화 시작</button>
+            <button class="btn-ghost" id="clearChat">모두 지우기</button>
+          </section>
+        </div>
+
+        <div class="side-footer">
+          <span class="tiny">DELOS v1.0</span>
+          <span class="tiny">Ollama · DuckDuckGo</span>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="main">
+
+        <!-- Research console -->
+        <section class="research" id="researchPanel">
+          <div class="research-head">
+            <span class="research-title">
+              <span class="pulse-dot"></span> 실시간 웹 리서치 콘솔
+            </span>
+            <button class="icon-btn" id="toggleResearch" title="접기/펼치기">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="research-body" id="researchBody">
+            <div class="research-steps" id="researchSteps">
+              <div class="rstep muted">아직 리서치가 실행되지 않았습니다. 질문을 입력하면 DuckDuckGo 엔드포인트에서 실시간으로 소스를 수집합니다.</div>
+            </div>
+            <div class="research-sources" id="researchSources"></div>
+          </div>
+        </section>
+
+        <!-- Chat stream -->
+        <section class="stream" id="stream">
+          <div class="welcome" id="welcome">
+            <div class="welcome-fox">
+              <svg viewBox="0 0 160 160" width="120" height="120" aria-hidden="true">
+                <use href="#foxDefs"/>
+                <g transform="translate(0,0)">
+                  <path d="M80 36 L114 50 L106 92 L80 128 L54 92 L46 50 Z" fill="none" stroke="url(#foxFire)" stroke-width="2"/>
+                </g>
+              </svg>
+            </div>
+            <h2 class="welcome-title">DELOS에 오신 것을 환영합니다</h2>
+            <p class="welcome-sub">실시간 스트리밍 추론 · DuckDuckGo 실시간 웹 리서치 · 정밀 인용</p>
+            <div class="chips">
+              <button class="chip">2024년 이후 AI 반도체 시장 동향은?</button>
+              <button class="chip">양자컴퓨터와 암호학의 미래를 정리해줘</button>
+              <button class="chip">최신 웹 기술 트렌드를 조사해줘</button>
+              <button class="chip">맥 OS 디자인 원칙을 설명해줘</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Composer -->
+        <div class="composer-wrap">
+          <div class="composer glass-card">
+            <button class="composer-btn" id="btnAttach" title="첨부">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <textarea id="input" class="composer-input" rows="1"
+              placeholder="무엇이든 물어보세요 — Enter 전송, Shift+Enter 줄바꿈"></textarea>
+            <div class="composer-actions">
+              <span class="token-meter" id="tokenMeter">0 tok/s</span>
+              <button class="send-btn" id="btnSend" title="전송">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 12l16-8-6 16-3-6-7-2z" fill="currentColor"/></svg>
+              </button>
+              <button class="stop-btn hidden" id="btnStop" title="중지">
+                <span></span>
+              </button>
+            </div>
+          </div>
+          <div class="composer-hint">
+            <span>DELOS · Devil Fox Neural Core</span>
+            <span id="engineInfo">engine: ollama</span>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
